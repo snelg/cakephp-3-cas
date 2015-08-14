@@ -49,7 +49,7 @@ class CasAuthenticate extends BaseAuthenticate
         return array_merge(['username' => phpCAS::getUser()], phpCAS::getAttributes());
     }
 
-    public function unauthenticated(Request $request, Response $response)
+    public function getUser(Request $request)
     {
         //Since CAS authenticates externally (i.e. via browser redirect),
         //we directly trigger Auth->identify() here
@@ -59,7 +59,7 @@ class CasAuthenticate extends BaseAuthenticate
                 //This will eventually call back in to $this->authenticate above
                 $user = $controller->Auth->identify();
                 $controller->Auth->setUser($user);
-                return true;
+                return $user;
             }
         }
         return false;
