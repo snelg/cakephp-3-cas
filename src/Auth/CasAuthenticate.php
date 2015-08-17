@@ -2,6 +2,7 @@
 namespace CasAuth\Auth;
 
 use Cake\Auth\BaseAuthenticate;
+use Cake\Event\EventDispatcherTrait;
 use Cake\Network\Request;
 use Cake\Network\Response;
 use Cake\Controller\ComponentRegistry;
@@ -11,6 +12,8 @@ use phpCAS;
 
 class CasAuthenticate extends BaseAuthenticate
 {
+    use EventDispatcherTrait;
+
     protected $_defaultConfig = [
         'hostname' => null,
         'port' => null,
@@ -38,6 +41,13 @@ class CasAuthenticate extends BaseAuthenticate
         } else {
             phpCAS::setCasServerCACert($settings['cert_path']);
         }
+
+        if (!empty($registry)) {
+            $controller = $registry->getController();
+            if (!empty($controller)) {
+                $this->eventManager($controller->eventManager());
+            }
+        }
     }
 
     public function authenticate(Request $request, Response $response)
@@ -46,23 +56,35 @@ class CasAuthenticate extends BaseAuthenticate
         phpCAS::forceAuthentication();
         //If we get here, then phpCAS::forceAuthentication returned
         //successfully and we are thus authenticated
-        return array_merge(['username' => phpCAS::getUser()], phpCAS::getAttributes());
+
+        $user = array_merge(['username' => phpCAS::getUser()], phpCAS::getAttributes());
+
+        //Listen for this event if you need to add/modify CAS user attributes
+        $event = $this->dispatchEvent('CasAuth.authenticate', $user);
+        if (!empty($event->result)) {
+            $user = $event->result;
+        }
+
+        return $user;
     }
 
     public function getUser(Request $request)
     {
+        if (empty($this->_registry)) {
+            return false;
+        }
+        $controller = $this->_registry->getController();
+        if (empty($controller->Auth)) {
+            return false;
+        }
+
         //Since CAS authenticates externally (i.e. via browser redirect),
         //we directly trigger Auth->identify() here
-        if (!empty($this->_registry)) {
-            $controller = $this->_registry->getController();
-            if (!empty($controller->Auth)) {
-                //This will eventually call back in to $this->authenticate above
-                $user = $controller->Auth->identify();
-                $controller->Auth->setUser($user);
-                return $user;
-            }
-        }
-        return false;
+        //This will eventually call back in to $this->authenticate above
+        $user = $controller->Auth->identify();
+
+        $controller->Auth->setUser($user);
+        return $user;
     }
 
     public function logout()
