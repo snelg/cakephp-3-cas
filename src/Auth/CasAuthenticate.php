@@ -16,8 +16,8 @@ class CasAuthenticate extends BaseAuthenticate
 
     protected $_defaultConfig = [
         'hostname' => null,
-        'port' => null,
-        'uri' => null
+        'port' => 443,
+        'uri' => ''
     ];
 
     public function __construct(ComponentRegistry $registry, array $config = [])
