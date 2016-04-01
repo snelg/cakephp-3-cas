@@ -132,12 +132,11 @@ class CasAuthenticate extends BaseAuthenticate
             //        header, which is a problem because CakePHP still thinks the
             //        user is logged in. See Step 2.
             phpCAS::logout(['url' => Router::url('/', true)]);
-        } else {
-            //Step 2. This will run when the CAS server has redirected the client
-            //        back to us. Do nothing in this block, then after this method
-            //        returns CakePHP will do whatever is necessary to log the user
-            //        out from its end (destroying the session or whatever).
         }
+        //Step 2. We reach this line when the CAS server has redirected the
+        //        client back to us. Do nothing in this block; then after this
+        //        method returns, CakePHP will do whatever is necessary to log
+        //        the user out from its end (destroying the session or whatever).
     }
 
     /**
