@@ -55,7 +55,13 @@ class CasAuthenticate extends BaseAuthenticate
             phpCAS::setDebug(LOGS . 'phpCas.log');
         }
 
-        phpCAS::client(CAS_VERSION_2_0, $settings['hostname'], $settings['port'], $settings['uri']);
+        //The "isInitialized" check isn't necessary during normal use,
+        //but during *testing* if Authentication is tested more than once, then
+        //the fact that phpCAS uses a static global initialization can
+        //cause problems
+        if (!phpCAS::isInitialized()) {
+            phpCAS::client(CAS_VERSION_2_0, $settings['hostname'], $settings['port'], $settings['uri']);
+        }
 
         if (empty($settings['cert_path'])) {
             phpCAS::setNoCasServerValidation();
