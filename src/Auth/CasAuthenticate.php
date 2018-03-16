@@ -23,8 +23,8 @@ use Cake\Auth\BaseAuthenticate;
 use Cake\Controller\ComponentRegistry;
 use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
-use Cake\Network\Request;
-use Cake\Network\Response;
+use Cake\Http\Response;
+use Cake\Http\ServerRequest;
 use Cake\Routing\Router;
 use phpCAS;
 
@@ -46,10 +46,10 @@ class CasAuthenticate extends BaseAuthenticate
         //Configuration params can be set via global Configure::write or via Auth->config
         //Auth->config params override global Configure, so we'll pass them in last
         parent::__construct($registry, (array)Configure::read('CAS'));
-        $this->config($config);
+        $this->setConfig($config);
 
         //Get the merged config settings
-        $settings = $this->config();
+        $settings = $this->getConfig();
 
         if (!empty($settings['debug'])) {
             phpCAS::setDebug(LOGS . 'phpCas.log');
@@ -80,7 +80,7 @@ class CasAuthenticate extends BaseAuthenticate
     /**
      * {@inheritDoc}
      */
-    public function authenticate(Request $request, Response $response)
+    public function authenticate(ServerRequest $request, Response $response)
     {
         phpCAS::handleLogoutRequests(false);
         phpCAS::forceAuthentication();
@@ -101,7 +101,7 @@ class CasAuthenticate extends BaseAuthenticate
     /**
      * {@inheritDoc}
      */
-    public function getUser(Request $request)
+    public function getUser(ServerRequest $request)
     {
         if (empty($this->_registry)) {
             return false;
