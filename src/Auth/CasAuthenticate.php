@@ -21,7 +21,9 @@ namespace CasAuth\Auth;
 
 use Cake\Auth\BaseAuthenticate;
 use Cake\Controller\ComponentRegistry;
+use Cake\Controller\Component\AuthComponent;
 use Cake\Core\Configure;
+use Cake\Event\Event;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Network\Request;
 use Cake\Network\Response;
@@ -117,6 +119,7 @@ class CasAuthenticate extends BaseAuthenticate
         $user = $controller->Auth->identify();
 
         $controller->Auth->setUser($user);
+
         return $user;
     }
 
@@ -124,9 +127,11 @@ class CasAuthenticate extends BaseAuthenticate
      * Log a user out. Interrupts initial call to AuthComponent logout
      * to handle CAS logout, which happens on separate CAS server
      *
+     * @param Event $event Auth.logout event
+     *
      * @return void
      */
-    public function logout()
+    public function logout(Event $event)
     {
         if (phpCAS::isAuthenticated()) {
             //Step 1. When the client clicks logout, this will run.
@@ -137,7 +142,14 @@ class CasAuthenticate extends BaseAuthenticate
             //        phpCAS will stop script execution after it sends the redirect
             //        header, which is a problem because CakePHP still thinks the
             //        user is logged in. See Step 2.
-            phpCAS::logout(['url' => Router::url('/', true)]);
+            $auth = $event->subject();
+            if ($auth instanceof AuthComponent) {
+                $redirectUrl = $auth->config('logoutRedirect');
+            }
+            if (empty($redirectUrl)) {
+                $redirectUrl = '/';
+            }
+            phpCAS::logout(['url' => Router::url($redirectUrl, true)]);
         }
         //Step 2. We reach this line when the CAS server has redirected the
         //        client back to us. Do nothing in this block; then after this
