@@ -74,7 +74,7 @@ class CasAuthenticate extends BaseAuthenticate
         if (!empty($registry)) {
             $controller = $registry->getController();
             if (!empty($controller)) {
-                $this->eventManager($controller->eventManager());
+                $this->setEventManager($controller->getEventManager());
             }
         }
     }

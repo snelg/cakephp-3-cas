@@ -4,7 +4,7 @@
     "description": "CAS Authentication for CakePHP 3",
     "license": "MIT",
     "require": {
-        "cakephp/cakephp": "^3.4.3",
+        "cakephp/cakephp": "^3.5.0",
         "jasig/phpcas": "~1.3.3"
     },
     "require-dev": {
