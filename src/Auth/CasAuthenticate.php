@@ -142,9 +142,9 @@ class CasAuthenticate extends BaseAuthenticate
             //        phpCAS will stop script execution after it sends the redirect
             //        header, which is a problem because CakePHP still thinks the
             //        user is logged in. See Step 2.
-            $auth = $event->subject();
+            $auth = $event->getSubject();
             if ($auth instanceof AuthComponent) {
-                $redirectUrl = $auth->config('logoutRedirect');
+                $redirectUrl = $auth->getConfig('logoutRedirect');
             }
             if (empty($redirectUrl)) {
                 $redirectUrl = '/';
