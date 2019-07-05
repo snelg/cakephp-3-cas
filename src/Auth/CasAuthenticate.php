@@ -65,6 +65,12 @@ class CasAuthenticate extends BaseAuthenticate
             phpCAS::client(CAS_VERSION_2_0, $settings['hostname'], $settings['port'], $settings['uri']);
         }
 
+        if (!empty($settings['curlopts'])) {
+            foreach ($settings['curlopts'] as $key => $val) {
+                phpCAS::setExtraCurlOption($key, $val);
+            }
+        }
+
         if (empty($settings['cert_path'])) {
             phpCAS::setNoCasServerValidation();
         } else {

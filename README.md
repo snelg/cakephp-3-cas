@@ -51,3 +51,7 @@ Configure::write('CAS.port', 8443);
 * **uri** defaults to '' (an empty string)
 * *debug* (optional) if true, then phpCAS will write debug info to logs/phpCAS.log
 * *cert_path* (optional) if set, then phpCAS will use the specified CA certificate file to verify the CAS server
+* *curlopts* (optional) key/value paired array of additional CURL parameters to pass through to phpCAS::setExtraCurlOption, e.g.
+```php
+    'curlopts' => [CURLOPT_PROXY => 'http://proxy:5543', CURLOPT_CRLF => true]
+```
